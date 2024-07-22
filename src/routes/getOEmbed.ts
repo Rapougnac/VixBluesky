@@ -14,7 +14,6 @@ export const getOEmbed: Handler<Env, "/oembed"> = async (c) => {
     provider_url: "https://bskyx.app/",
     thumbnail_width: 1000,
     thumbnail_height: 1000,
-    author_url: 'https://google.com',
   };
 
   if (avatar !== undefined) {
