@@ -17,7 +17,7 @@ export const Layout = ({ url, children }: LayoutProps) => {
         <link rel="canonical" href="${url.substring(1)}" />
         <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
         <meta content="#0085ff" name="theme-color" />
-        <meta property="og:site_name" content="FixBluesky" />
+        <meta property="og:site_name" content="VixBluesky" />
 
         ${children}
         <meta http-equiv="refresh" content="0;url=${redirectUrl}" />

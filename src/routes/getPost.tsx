@@ -20,7 +20,7 @@ export const getPost: Handler<
     <Post
       post={data.posts[0]}
       url={c.req.path}
-      appDomain={c.env.FIXBLUESKY_APP_DOMAIN}
+      appDomain={c.env.VIXBLUESKY_APP_DOMAIN}
     />
   );
 };

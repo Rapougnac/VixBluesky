@@ -1,4 +1,4 @@
-name = "fixbluesky"
+name = "vixbluesky"
 main = "src/index.ts"
 compatibility_date = "2023-01-01"
 
@@ -7,4 +7,4 @@ route = { pattern = "bskyx.app/*", zone_name = "bskyx.app" }
 
 [vars]
 BSKY_SERVICE_URL="https://bsky.social/"
-FIXBLUESKY_APP_DOMAIN="bskyx.app"
+VIXBLUESKY_APP_DOMAIN="bskyx.app"

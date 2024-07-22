@@ -10,7 +10,7 @@ export const getOEmbed: Handler<Env, "/oembed"> = async (c) => {
   const avatar = c.req.query("avatar");
 
   const defaults = {
-    provider_name: "FixBluesky",
+    provider_name: "VixBluesky",
     provider_url: "https://bskyx.app/",
     thumbnail_width: 1000,
     thumbnail_height: 1000,
