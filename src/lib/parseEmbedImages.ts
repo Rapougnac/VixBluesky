@@ -5,7 +5,11 @@ import {
   AppBskyFeedDefs,
 } from "@atproto/api";
 
-export function parseEmbedImage(post: AppBskyFeedDefs.PostView) {
+export function parseEmbedImages(
+  post: AppBskyFeedDefs.PostView
+): string | AppBskyEmbedImages.ViewImage[] {
+  let images: AppBskyEmbedImages.ViewImage[] = [];
+
   if (AppBskyEmbedRecord.isView(post.embed)) {
     const { success: isView } = AppBskyEmbedRecord.validateView(post.embed);
     if (isView && AppBskyEmbedRecord.isViewRecord(post.embed.record)) {
@@ -21,7 +25,7 @@ export function parseEmbedImage(post: AppBskyFeedDefs.PostView) {
           post.embed.record.embeds[0]
         );
         if (isImageView) {
-          return post.embed.record.embeds[0].images[0].fullsize;
+          images = [...images, ...post.embed.record.embeds[0].images];
         }
       }
     }
@@ -35,7 +39,7 @@ export function parseEmbedImage(post: AppBskyFeedDefs.PostView) {
         post.embed.media
       );
       if (isImageView) {
-        return post.embed.media.images[0].fullsize;
+        images = [...images, ...post.embed.media.images];
       }
     }
   }
@@ -44,8 +48,9 @@ export function parseEmbedImage(post: AppBskyFeedDefs.PostView) {
       post.embed
     );
     if (isImageView) {
-      return post.embed.images[0].fullsize;
+      images = [...images, ...post.embed.images];
     }
   }
-  return post.author.avatar ?? "";
+
+  return images.length === 0 ? post.author.avatar ?? "" : images;
 }

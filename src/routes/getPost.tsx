@@ -15,7 +15,7 @@ export const getPost: Handler<
       message: "Failed to fetch the post!",
     });
   }
-  // return c.html(genHTML(data.posts[0], c.req.path));
+
   return c.html(
     <Post
       post={data.posts[0]}

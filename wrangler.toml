@@ -3,8 +3,8 @@ main = "src/index.ts"
 compatibility_date = "2023-01-01"
 
 workers_dev = false
-route = { pattern = "bsyy.app/*", zone_name = "bsyy.app" }
+route = { pattern = "bskyx.app/*", zone_name = "bskyx.app" }
 
 [vars]
 BSKY_SERVICE_URL="https://bsky.social/"
-FIXBLUESKY_APP_DOMAIN="bsyy.app"
+FIXBLUESKY_APP_DOMAIN="bskyx.app"

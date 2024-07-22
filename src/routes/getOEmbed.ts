@@ -11,14 +11,20 @@ export const getOEmbed: Handler<Env, "/oembed"> = async (c) => {
 
   const defaults = {
     provider_name: "FixBluesky",
-    provider_url: "https://bsyy.app/",
-    thumbnail_url: avatar,
+    provider_url: "https://bskyx.app/",
     thumbnail_width: 1000,
     thumbnail_height: 1000,
+    author_url: 'https://google.com',
   };
+
+  if (avatar !== undefined) {
+    (defaults as typeof defaults & { thumbnail_url?: string }).thumbnail_url =
+      decodeURIComponent(avatar);
+  }
 
   if (type === OEmbedTypes.Post) {
     const { replies, reposts, likes } = c.req.query();
+
     return c.json({
       author_name: `🗨️ ${replies}    ♻️ ${reposts}    💙 ${likes}`,
       ...defaults,

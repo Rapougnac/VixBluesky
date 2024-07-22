@@ -1,17 +1,18 @@
-# FixBluesky 🛠️ (Inspired by [FixTweet](https://github.com/FixTweet/FixTweet))
+# VixBluesky 🛠️ (Inspired by [FixTweet](https://github.com/FixTweet/FixTweet))
 
-Embed Bluesky links in Discord
+> [!IMPORTANT]
+> This is a fork of [FixBluesky](https://github.com/ItsRauf/FixBluesky) by [@ItsRauf](https://www.github.com/ItsRauf).
+> All credits go to them for the original idea and implementation.
 
-## Written With
-
-[![Tech Stack](https://skillicons.dev/icons?i=ts,html,workers)](https://skillicons.dev)
+Embed Bluesky links in Discord.
 
 ## How To Use?
 
-#### Simply replace the `k` in `bsky.app` with a `y`
+#### Simply append `x` at the end of `bsky.app`.
 
 _or you can post the link in Discord and type `s/k/y`_
 
 ## Authors
 
-- [@ItsRauf](https://www.github.com/ItsRauf)
+- [@ItsRauf](https://www.github.com/ItsRauf) - Original author
+- [@Lexedia](https://www.github.com/Rapougnac)

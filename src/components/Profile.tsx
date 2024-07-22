@@ -11,6 +11,7 @@ interface ProfileProps {
 
 export const Profile = ({ profile, url, appDomain }: ProfileProps) => (
   <Layout url={url}>
+    <meta name="og:type" content="article" />
     <meta name="twitter:creator" content={`@${profile.handle}`} />
     <meta property="og:description" content={profile.description ?? ""} />
     <meta
@@ -18,6 +19,7 @@ export const Profile = ({ profile, url, appDomain }: ProfileProps) => (
       content={`${profile.displayName} (@${profile.handle})`}
     />
     <meta property="og:image" content={profile.avatar} />
+    <meta properpty="article:published_time" content={profile.createdAt} />
 
     <link
       type="application/json+oembed"
