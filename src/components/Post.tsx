@@ -11,12 +11,31 @@ interface PostProps {
   appDomain: string;
 }
 
-const Meta = (post: AppBskyFeedDefs.PostView) => (
+const Meta = ({ post }: { post: AppBskyFeedDefs.PostView }) => (
   <>
-    <meta name="article:published_time" content={post.indexedAt} />
     <meta name="twitter:card" content="summary_large_image" />
-    {/* <meta name="apple-mobile-web-app-title" content={post.author.handle} />
-    <link rel="apple-touch-icon" href={post.author.avatar} /> */}
+  </>
+);
+
+const Images = ({
+  images,
+}: {
+  images: AppBskyEmbedImages.ViewImage[] | string;
+}) => (
+  <>
+    {typeof images === "string" ? (
+      <>
+        <meta property="og:image" content={images} />
+        <meta property="twitter:image" content={images} />
+      </>
+    ) : (
+      images.map((img, i) => (
+        <>
+          <meta property="og:image" content={img.fullsize} />(
+          {i === 0 && <meta property="twitter:image" content={img.fullsize} />})
+        </>
+      ))
+    )}
   </>
 );
 
@@ -28,22 +47,24 @@ export const Post = ({ post, url, appDomain }: PostProps) => {
     <Layout url={url}>
       <meta name="twitter:creator" content={`@${post.author.handle}`} />
       <meta property="og:description" content={parseEmbedDescription(post)} />
-      <meta property="og:title" content={post.author.displayName} />
-      {console.log(post)}
+      <meta
+        property="og:title"
+        content={`${post.author.displayName} (@${post.author.handle})`}
+      />
+      <meta
+        property="twitter:title"
+        content={`${post.author.displayName} (@${post.author.handle})`}
+      />
       <meta property="og:updated_time" content={post.indexedAt} />
       <meta property="article:published_time" content={post.indexedAt} />
+      {/* <meta property="og:image" content={post.author.avatar} /> */}
 
-      {images && typeof images === "string" ? (
-        <meta property="og:image" content={images} />
-      ) : (
-        (images as AppBskyEmbedImages.ViewImage[]).map((img) => (
-          <meta property="og:image" content={img.fullsize} />
-        ))
-      )}
+      {!isAuthor && <Meta post={post} />}
 
-      {!isAuthor && <Meta {...post} />}
+      {images.length !== 0 && <Images images={images} />}
 
       <link
+        rel="alternate"
         type="application/json+oembed"
         href={`https:/${appDomain}/oembed?type=${OEmbedTypes.Post}&replies=${
           post.replyCount

@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { BskyAgent } from "@atproto/api";
+import { AtpSessionData, BskyAgent } from "@atproto/api";
 import { getPost } from "./routes/getPost";
 import { getPostData } from "./routes/getPostData";
 import { getOEmbed } from "./routes/getOEmbed";
@@ -10,12 +10,23 @@ import { HTTPException } from "hono/http-exception";
 const app = new Hono<Env>();
 
 app.use("*", async (c, next) => {
-  const agent = new BskyAgent({ service: c.env.BSKY_SERVICE_URL });
+  const agent = new BskyAgent({
+    service: c.env.BSKY_SERVICE_URL,
+    async persistSession(_, session) {
+      return c.env.bskyx.put("session", JSON.stringify(session));
+    },
+  });
   try {
-    await agent.login({
-      identifier: c.env.BSKY_AUTH_USERNAME,
-      password: c.env.BSKY_AUTH_PASSWORD,
-    });
+    const rawSession = await c.env.bskyx.get("session");
+    if (rawSession) {
+      const session = JSON.parse(rawSession) as AtpSessionData;
+      await agent.resumeSession(session);
+    } else {
+      await agent.login({
+        identifier: c.env.BSKY_AUTH_USERNAME,
+        password: c.env.BSKY_AUTH_PASSWORD,
+      });
+    }
     c.set("Agent", agent);
   } catch (error) {
     const err = new Error("Failed to login to Bluesky!", {
