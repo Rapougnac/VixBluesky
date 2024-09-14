@@ -77,13 +77,9 @@ async function parseM3U8(
     } else if (line.includes("m3u8")) {
       const resolvedUrl = `${initalUrl}/${line}`;
 
-      console.log(resolvedUrl);
-
       const cont = await fetch(resolvedUrl).then((res) => res.text());
 
       const parsed = await parseM3U8(removeLastPathSegment(resolvedUrl), cont);
-
-      console.log(parsed);
 
       streams.at(-1)!.uri = parsed.streams[0].uri;
     } else if (line.includes(".ts")) {
@@ -101,8 +97,6 @@ async function parseM3U8(
       continue;
     }
   }
-
-  console.log(streams);
 
   return { version, streams };
 }
