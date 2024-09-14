@@ -29,8 +29,6 @@ const Video = ({
 }) => {
   const url = `${apiUrl}generate/${encodeURIComponent(streamInfo.uri)}.mp4`;
 
-  console.log(url);
-
   return (
     <>
       <meta property="twitter:card" content="player" />
