@@ -8,6 +8,7 @@ route = { pattern = "bskyx.app/*", zone_name = "bskyx.app" }
 [vars]
 BSKY_SERVICE_URL="https://bsky.social/"
 VIXBLUESKY_APP_DOMAIN="bskyx.app"
+VIXBLUESKY_API_URL="https://api.bskyx.app/"
 
 [[kv_namespaces]]
 binding = "bskyx"

@@ -4,7 +4,7 @@
           "name": "Wrangler",
           "type": "node",
           "request": "attach",
-          "port": 4365,
+          "port": 8787,
           "cwd": "/",
           "resolveSourceMapLocations": null,
           "attachExistingChildren": false,

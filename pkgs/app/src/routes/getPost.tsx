@@ -2,6 +2,7 @@ import { Handler } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { fetchPost } from "../lib/fetchPostData";
 import { Post } from "../components/Post";
+import { processVideoEmbed, StreamInfo } from "../lib/processVideoEmbed";
 
 export const getPost: Handler<
   Env,
@@ -16,11 +17,24 @@ export const getPost: Handler<
     });
   }
 
+  const fetchedPost = data.posts[0];
+
+  let videoMetaData: StreamInfo[] | undefined;
+
+  if (
+    typeof fetchedPost.embed?.$type === "string" &&
+    fetchedPost.embed?.$type.startsWith("app.bsky.embed.video")
+  ) {
+    videoMetaData = await processVideoEmbed(fetchedPost);
+  }
+
   return c.html(
     <Post
-      post={data.posts[0]}
+      post={fetchedPost}
       url={c.req.path}
       appDomain={c.env.VIXBLUESKY_APP_DOMAIN}
+      videoMetadata={videoMetaData}
+      apiUrl={c.env.VIXBLUESKY_API_URL}
     />
   );
 };

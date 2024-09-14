@@ -6,6 +6,7 @@ import { getOEmbed } from "./routes/getOEmbed";
 import { getProfileData } from "./routes/getProfileData";
 import { getProfile } from "./routes/getProfile";
 import { HTTPException } from "hono/http-exception";
+// import { getPostVideo } from "./routes/getPostVideo";
 
 const app = new Hono<Env>();
 
@@ -45,6 +46,8 @@ app.get("/", async (c) => {
 
 app.get("/profile/:user/post/:post", getPost);
 app.get("/https://bsky.app/profile/:user/post/:post", getPost);
+// app.get("/profile/:user/post/:post/video", getPostVideo);
+// app.get("/https://bsky.app/profile/:user/post/:post/video", getPostVideo);
 
 app.get("/profile/:user/post/:post/json", getPostData);
 app.get("/https://bsky.app/profile/:user/post/:post/json", getPostData);
