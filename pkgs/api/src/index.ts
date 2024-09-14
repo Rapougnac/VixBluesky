@@ -26,9 +26,9 @@ declare global {
   }
 }
 
-const env = process.env.NODE_ENV ?? "development";
+const { NODE_ENV: env = "development" } = process.env;
 
-const app = fastify({ logger: envToLogger[env] ?? true });
+const app = fastify({ logger: envToLogger[env] });
 
 app.get("/", async (_, res) => res.redirect("https://bskyx.app"));
 
@@ -48,12 +48,10 @@ app.get<{ Params: { "*": string } }>(
   async (req, res) => {
     let url = req.params["*"];
 
-    // Remove the .mp4 from the end of the URL
     if (url.endsWith(".mp4")) {
       url = url.slice(0, -4);
     }
 
-    // Decode the URL
     url = decodeURIComponent(url);
 
     const result = await fetch(url).then((res) => res.arrayBuffer());

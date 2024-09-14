@@ -16,8 +16,6 @@ export function tsToMpeg4(buffer: Buffer | Uint8Array): Promise<Buffer> {
 
     const tempFilePath = path.join(tmpdir(), `output-${Date.now()}.mp4`);
 
-    // The streams appear to be H264-AVC encoded, so all that needs to be done for Discord to display them is to "remux" the streams into an mp4 container
-
     ffmpeg(input)
       .outputOption(
         "-c",
