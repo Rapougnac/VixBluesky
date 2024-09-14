@@ -4,11 +4,14 @@ import { Layout } from "./Layout";
 import { OEmbedTypes } from "../routes/getOEmbed";
 import { parseEmbedImages } from "../lib/parseEmbedImages";
 import { parseEmbedDescription } from "../lib/parseEmbedDescription";
+import { StreamInfo } from "../lib/processVideoEmbed";
 
 interface PostProps {
   post: AppBskyFeedDefs.PostView;
   url: string;
   appDomain: string;
+  videoMetadata?: StreamInfo[] | undefined;
+  apiUrl: string;
 }
 
 const Meta = ({ post }: { post: AppBskyFeedDefs.PostView }) => (
@@ -16,6 +19,44 @@ const Meta = ({ post }: { post: AppBskyFeedDefs.PostView }) => (
     <meta name="twitter:card" content="summary_large_image" />
   </>
 );
+
+const Video = ({
+  streamInfo,
+  apiUrl,
+}: {
+  streamInfo: StreamInfo;
+  apiUrl: string;
+}) => {
+  const url = `${apiUrl}generate/${encodeURIComponent(streamInfo.uri)}.mp4`;
+
+  return (
+    <>
+      <meta property="twitter:card" content="player" />
+      <meta property="twitter:player" content={url} />
+      <meta property="twitter:player:stream" content={url} />
+      <meta property="og:type" content="video.other" />
+      <meta property="og:video" content={url} />
+      <meta property="og:video:secure_url" content={url} />
+      <meta property="og:video:type" content="video/mp4" />
+      <meta
+        property="og:video:width"
+        content={streamInfo.resolution.width.toString()}
+      />
+      <meta
+        property="og:video:height"
+        content={streamInfo.resolution.height.toString()}
+      />
+      <meta
+        property="twitter:player:width"
+        content={streamInfo.resolution.width.toString()}
+      />
+      <meta
+        property="twitter:player:height"
+        content={streamInfo.resolution.height.toString()}
+      />
+    </>
+  );
+};
 
 const Images = ({
   images,
@@ -39,7 +80,13 @@ const Images = ({
   </>
 );
 
-export const Post = ({ post, url, appDomain }: PostProps) => {
+export const Post = ({
+  post,
+  url,
+  appDomain,
+  videoMetadata,
+  apiUrl,
+}: PostProps) => {
   const images = parseEmbedImages(post);
   const isAuthor = images === post.author.avatar;
 
@@ -61,7 +108,11 @@ export const Post = ({ post, url, appDomain }: PostProps) => {
 
       {!isAuthor && <Meta post={post} />}
 
-      {images.length !== 0 && <Images images={images} />}
+      {images.length !== 0 && !videoMetadata && <Images images={images} />}
+
+      {videoMetadata && (
+        <Video apiUrl={apiUrl} streamInfo={videoMetadata.at(-1)!} />
+      )}
 
       <link
         rel="alternate"
