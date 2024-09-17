@@ -11,6 +11,8 @@ export const getPost: Handler<
   const { user, post } = c.req.param();
   const agent = c.get("Agent");
   const { data, success } = await fetchPost(agent, { user, post });
+
+  console.log(data);
   if (!success) {
     throw new HTTPException(500, {
       message: "Failed to fetch the post!",

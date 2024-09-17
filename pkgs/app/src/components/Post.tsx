@@ -5,6 +5,7 @@ import { OEmbedTypes } from "../routes/getOEmbed";
 import { parseEmbedImages } from "../lib/parseEmbedImages";
 import { parseEmbedDescription } from "../lib/parseEmbedDescription";
 import { StreamInfo } from "../lib/processVideoEmbed";
+import { join } from "../lib/utils";
 
 interface PostProps {
   post: AppBskyFeedDefs.PostView;
@@ -23,11 +24,20 @@ const Meta = ({ post }: { post: AppBskyFeedDefs.PostView }) => (
 const Video = ({
   streamInfo,
   apiUrl,
+  appDomain,
+  post,
+  description,
 }: {
   streamInfo: StreamInfo;
   apiUrl: string;
+  appDomain: string;
+  post: AppBskyFeedDefs.PostView;
+  description: string;
 }) => {
-  const url = `${apiUrl}generate/${encodeURIComponent(streamInfo.uri)}.mp4`;
+  // Discord can't handle query params in the URL, so i have to do this 🔥beautiful mess🔥
+  const url = `${apiUrl}generate/${btoa(join(streamInfo.uri, ";"))}.mp4`;
+
+  console.log(url);
 
   return (
     <>
@@ -53,6 +63,18 @@ const Video = ({
       <meta
         property="twitter:player:height"
         content={streamInfo.resolution.height.toString()}
+      />
+
+      <link
+        rel="alternate"
+        type="application/json+oembed"
+        href={`https:/${appDomain}/oembed?type=${OEmbedTypes.Video}&replies=${
+          post.replyCount
+        }&reposts=${post.repostCount}&likes=${
+          post.likeCount
+        }&avatar=${encodeURIComponent(
+          post.author.avatar ?? ""
+        )}&description=${encodeURIComponent(description)}`}
       />
     </>
   );
@@ -89,11 +111,14 @@ export const Post = ({
 }: PostProps) => {
   const images = parseEmbedImages(post);
   const isAuthor = images === post.author.avatar;
+  const description = parseEmbedDescription(post);
+
+  console.log(post);
 
   return (
     <Layout url={url}>
       <meta name="twitter:creator" content={`@${post.author.handle}`} />
-      <meta property="og:description" content={parseEmbedDescription(post)} />
+      <meta property="og:description" content={description} />
       <meta
         property="og:title"
         content={`${post.author.displayName} (@${post.author.handle})`}
@@ -111,18 +136,28 @@ export const Post = ({
       {images.length !== 0 && !videoMetadata && <Images images={images} />}
 
       {videoMetadata && (
-        <Video apiUrl={apiUrl} streamInfo={videoMetadata.at(-1)!} />
+        <Video
+          apiUrl={apiUrl}
+          streamInfo={videoMetadata.at(-1)!}
+          appDomain={appDomain}
+          description={description}
+          post={post}
+        />
       )}
 
-      <link
-        rel="alternate"
-        type="application/json+oembed"
-        href={`https:/${appDomain}/oembed?type=${OEmbedTypes.Post}&replies=${
-          post.replyCount
-        }&reposts=${post.repostCount}&likes=${
-          post.likeCount
-        }&avatar=${encodeURIComponent(post.author.avatar ?? "")}`}
-      />
+      {!videoMetadata && (
+        <link
+          rel="alternate"
+          type="application/json+oembed"
+          href={`https:/${appDomain}/oembed?type=${OEmbedTypes.Post}&replies=${
+            post.replyCount
+          }&reposts=${post.repostCount}&likes=${
+            post.likeCount
+          }&avatar=${encodeURIComponent(
+            post.author.avatar ?? ""
+          )}&description=${encodeURIComponent(description)}`}
+        />
+      )}
     </Layout>
   );
 };

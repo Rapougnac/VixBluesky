@@ -46,20 +46,37 @@ app.get<{ Params: { "*": string } }>(
     },
   },
   async (req, res) => {
-    let url = req.params["*"];
+    // Idk anymore
+    let urls = Buffer.from(req.params["*"], 'base64').toString().split(";");
 
-    if (url.endsWith(".mp4")) {
-      url = url.slice(0, -4);
+    // Remove .mp4 extension if it exists
+    if (urls.at(-1)?.endsWith(".mp4")) {
+      urls = urls.slice(0, -1);
+      urls.push(urls.at(-1)?.slice(0, -4) as string);
     }
 
-    url = decodeURIComponent(url);
+    urls = urls.map((url) => decodeURIComponent(url));
 
-    const result = await fetch(url).then((res) => res.arrayBuffer());
+    const result = await Promise.allSettled(
+      urls.map((url) => fetch(url).then((res) => res.arrayBuffer()))
+    );
 
-    const video = await tsToMpeg4(Buffer.from(result));
+    if (result.some((res) => res.status === "rejected")) {
+      res.status(400).send({ error: "Failed to fetch video" });
+      return;
+    }
+
+    const buffers = result.map((res) =>
+      res.status === "fulfilled" ? new Uint8Array(res.value) : new Uint8Array(0)
+    );
+
+    const video = await tsToMpeg4(buffers);
+
+    const fileName = `video-${new Date().toUTCString()}.mp4`;
 
     res.header("Content-Type", "video/mp4");
     res.header("Cache-Control", "public, max-age=604800");
+    res.header("Content-Disposition", `attachment; filename=${fileName}`);
     res.send(video);
   }
 );
