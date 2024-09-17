@@ -8,11 +8,13 @@ import path from "node:path";
 
 ffmpeg.setFfmpegPath(ffmpegPath as string);
 
-export function tsToMpeg4(buffer: Buffer | Uint8Array): Promise<Buffer> {
+export function tsToMpeg4(buffers: Uint8Array[]): Promise<Buffer> {
   return new Promise((res, rej) => {
     const input = new PassThrough();
 
-    input.end(buffer);
+    buffers.forEach((b) => input.write(b));
+
+    input.end();
 
     const tempFilePath = path.join(tmpdir(), `output-${Date.now()}.mp4`);
 

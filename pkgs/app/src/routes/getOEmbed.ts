@@ -3,11 +3,14 @@ import { Handler } from "hono";
 export enum OEmbedTypes {
   Post = 1,
   Profile,
+  Video,
 }
 
 export const getOEmbed: Handler<Env, "/oembed"> = async (c) => {
   const type = +(c.req.query("type") ?? 0);
   const avatar = c.req.query("avatar");
+
+  console.log(type);
 
   const defaults = {
     provider_name: "VixBluesky",
@@ -36,5 +39,17 @@ export const getOEmbed: Handler<Env, "/oembed"> = async (c) => {
       ...defaults,
     });
   }
+
+  if (type === OEmbedTypes.Video) {
+    const { replies, reposts, likes, description } = c.req.query();
+    return c.json({
+      ...defaults,
+      provider_name: `VixBluesky\n\n🗨️ ${replies}    ♻️ ${reposts}    💙 ${likes}`,
+      description,
+      title: description,
+      author_name: description,
+    });
+  }
+
   return c.json(defaults, 400);
 };

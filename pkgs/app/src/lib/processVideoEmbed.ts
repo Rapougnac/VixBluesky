@@ -7,7 +7,7 @@ export interface StreamInfo {
     height: number;
   };
   codecs: string;
-  uri: string;
+  uri: string | string[];
 }
 
 export interface M3U8Data {
@@ -81,7 +81,7 @@ async function parseM3U8(
 
       const parsed = await parseM3U8(removeLastPathSegment(resolvedUrl), cont);
 
-      streams.at(-1)!.uri = parsed.streams[0].uri;
+      streams.at(-1)!.uri = parsed.streams.map((s) => s.uri as string);
     } else if (line.includes(".ts")) {
       streams.push({
         bandwidth: 0,
