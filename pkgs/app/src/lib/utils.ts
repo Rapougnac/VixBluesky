@@ -11,5 +11,5 @@ export const concatQueryParams = (params: Record<string, string | string[]>) =>
 export const join = (t: string | string[], s: string) =>
   Array.isArray(t) ? t.join(s) : t;
 
-
-export const checkType = (t: string, o: any) => typeof o.$type === 'string' && o.$type.startsWith(t) || o.$type === t;
+export const checkType = (t: string, o: any) =>
+  (typeof o.$type === "string" && o.$type.startsWith(t)) || o.$type === t;
