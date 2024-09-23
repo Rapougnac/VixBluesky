@@ -13,7 +13,9 @@ app.use("*", async (c, next) => {
   const agent = new BskyAgent({
     service: c.env.BSKY_SERVICE_URL,
     async persistSession(_, session) {
-      return c.env.bskyx.put("session", JSON.stringify(session));
+      if (session) {
+        return c.env.bskyx.put("session", JSON.stringify(session));
+      }
     },
   });
   try {

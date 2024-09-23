@@ -55,7 +55,7 @@ app.get<{ Params: { "*": string } }>(
       urls.push(urls.at(-1)?.slice(0, -4) as string);
     }
 
-    urls = urls.map((url) => decodeURIComponent(url));
+    urls = urls.map((url) => decodeURIComponent(url)).map((url) => url.replaceAll('\uFFFD', ''));
 
     const result = await Promise.allSettled(
       urls.map((url) => fetch(url).then((res) => res.arrayBuffer()))
@@ -72,11 +72,11 @@ app.get<{ Params: { "*": string } }>(
 
     const video = await tsToMpeg4(buffers);
 
-    const fileName = `video-${new Date().toUTCString()}.mp4`;
+    // const fileName = `video-${new Date().toUTCString()}.mp4`;
 
     res.header("Content-Type", "video/mp4");
     res.header("Cache-Control", "public, max-age=604800");
-    res.header("Content-Disposition", `attachment; filename=${fileName}`);
+    // res.header("Content-Disposition", `attachment; filename=${fileName}`);
     res.send(video);
   }
 );

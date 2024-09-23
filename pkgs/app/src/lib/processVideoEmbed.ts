@@ -15,8 +15,19 @@ export interface M3U8Data {
   streams: StreamInfo[];
 }
 
-export async function processVideoEmbed(post: AppBskyFeedDefs.PostView) {
-  const videoUrl = post.embed?.playlist as string | undefined;
+export interface VideoMedia {
+  $type: `app.bsky.embed.video${string}`;
+  cid: string;
+  playlist: string;
+  thumbnail: string;
+  aspectRatio: {
+    width: number;
+    height: number;
+  }
+}
+
+export async function processVideoEmbed(source?: VideoMedia | undefined) {
+  const videoUrl = source?.playlist as string | undefined;
 
   if (!videoUrl) {
     return;

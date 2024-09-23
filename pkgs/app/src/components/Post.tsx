@@ -37,8 +37,6 @@ const Video = ({
   // Discord can't handle query params in the URL, so i have to do this 🔥beautiful mess🔥
   const url = `${apiUrl}generate/${btoa(join(streamInfo.uri, ";"))}.mp4`;
 
-  console.log(url);
-
   return (
     <>
       <meta property="twitter:card" content="player" />
@@ -112,8 +110,6 @@ export const Post = ({
   const images = parseEmbedImages(post);
   const isAuthor = images === post.author.avatar;
   const description = parseEmbedDescription(post);
-
-  console.log(post);
 
   return (
     <Layout url={url}>
