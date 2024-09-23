@@ -2,7 +2,8 @@ import { Handler } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { fetchPost } from "../lib/fetchPostData";
 import { Post } from "../components/Post";
-import { processVideoEmbed, StreamInfo } from "../lib/processVideoEmbed";
+import { processVideoEmbed, StreamInfo, VideoMedia } from "../lib/processVideoEmbed";
+import { checkType } from "../lib/utils";
 
 export const getPost: Handler<
   Env,
@@ -12,7 +13,6 @@ export const getPost: Handler<
   const agent = c.get("Agent");
   const { data, success } = await fetchPost(agent, { user, post });
 
-  console.log(data);
   if (!success) {
     throw new HTTPException(500, {
       message: "Failed to fetch the post!",
@@ -24,10 +24,11 @@ export const getPost: Handler<
   let videoMetaData: StreamInfo[] | undefined;
 
   if (
-    typeof fetchedPost.embed?.$type === "string" &&
-    fetchedPost.embed?.$type.startsWith("app.bsky.embed.video")
+    checkType("app.bsky.embed.video", fetchedPost.embed) ||
+    checkType("app.bsky.embed.video", fetchedPost.embed?.media)
   ) {
-    videoMetaData = await processVideoEmbed(fetchedPost);
+    // @ts-expect-error
+    videoMetaData = await processVideoEmbed(fetchedPost.embed?.media || fetchedPost.embed);
   }
 
   return c.html(

@@ -8,6 +8,7 @@
     "skipLibCheck": true,
     "moduleResolution": "NodeNext",
     "outDir": "./dist",
+    "lib": ["ESNext"]
   },
   "include": ["./src/**/*.ts"],
 }
