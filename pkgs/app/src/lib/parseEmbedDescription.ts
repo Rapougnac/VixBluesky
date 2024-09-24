@@ -4,6 +4,7 @@ import {
   AppBskyFeedDefs,
   AppBskyFeedPost,
 } from "@atproto/api";
+import { indent } from "./utils";
 
 export function parseEmbedDescription(post: AppBskyFeedDefs.PostView) {
   if (AppBskyFeedPost.isRecord(post.record)) {
@@ -15,7 +16,7 @@ export function parseEmbedDescription(post: AppBskyFeedDefs.PostView) {
         );
         if (isViewRecord) {
           // @ts-expect-error For some reason the original post value is typed as {}
-          return `${post.record.text}\n\nQuoting @${post.embed.record.author.handle}\n➥  ${post.embed.record.value.text}`;
+          return `${post.record.text}\n\nQuoting @${post.embed.record.author.handle}\n➥${indent(post.embed.record.value.text, 2)}`;
         }
       }
     }
@@ -29,7 +30,7 @@ export function parseEmbedDescription(post: AppBskyFeedDefs.PostView) {
         );
         if (isViewRecord) {
           // @ts-expect-error For some reason the original post value is typed as {}
-          return `${post.record.text}\n\nQuoting @${post.embed.record.record.author.handle}\n➥  ${post.embed.record.record.value.text}`;
+          return `${post.record.text}\n\nQuoting @${post.embed.record.record.author.handle}\n➥${indent(post.embed.record.record.value.text, 2)}`;
         }
       }
     }

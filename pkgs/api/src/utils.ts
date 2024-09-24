@@ -1,52 +1,45 @@
-import ffmpeg from "fluent-ffmpeg";
-import ffmpegPath from "ffmpeg-static";
+import { type ChildProcess, spawn as s } from "node:child_process";
 
-import { PassThrough } from "node:stream";
-import fs from "node:fs/promises";
-import { tmpdir } from "node:os";
-import path from "node:path";
+import { type FastifyReply } from "fastify";
+import ffmpeg from "ffmpeg-static";
 
-ffmpeg.setFfmpegPath(ffmpegPath as string);
+export function bufferVideo(masterUrl: string, res: FastifyReply) {
+  let process: ChildProcess;
+  const cleanup = () => {
+    process?.kill("SIGTERM");
+    setTimeout(() => process?.kill("SIGKILL"), 5000);
+    res.raw.end();
+  };
 
-export function tsToMpeg4(buffers: Uint8Array[]): Promise<Buffer> {
-  return new Promise((res, rej) => {
-    const input = new PassThrough();
+  const args = [
+    "-loglevel",
+    "-8",
+    "-i",
+    masterUrl,
+    "-c:v",
+    "copy",
+    "-c:a",
+    "aac",
+    "-bsf:a",
+    "aac_adtstoasc",
+    "-movflags",
+    "faststart+frag_keyframe+empty_moov",
+    "-f",
+    "mp4",
+    "pipe:3",
+  ];
 
-    buffers.forEach((b) => input.write(b));
+  console.log(ffmpeg, args);
 
-    input.end();
-
-    const tempFilePath = path.join(tmpdir(), `output-${Date.now()}.mp4`);
-
-    ffmpeg(input)
-      .outputOption(
-        "-c",
-        "copy",
-        "-movflags",
-        "faststart",
-        "-preset",
-        "ultrafast"
-      )
-      .on("end", async () => {
-        try {
-          const ob = await fs.readFile(tempFilePath);
-          await fs.unlink(tempFilePath);
-          res(ob);
-        } catch (e) {
-          rej(e);
-        }
-      })
-      .on("error", async (err, stdout, stderr) => {
-        console.error("Error:", err.message);
-        console.error("ffmpeg stdout:", stdout);
-        console.error("ffmpeg stderr:", stderr);
-        try {
-          await fs.unlink(tempFilePath);
-        } catch (e) {
-          rej(e);
-        }
-        rej(err);
-      })
-      .save(tempFilePath);
+  process = s(...[ffmpeg!, args], {
+    windowsHide: true,
+    stdio: ["inherit", "inherit", "inherit", "pipe"],
   });
+
+  const [, , , stream] = process.stdio;
+  stream?.pipe(res.raw);
+  process.on("close", cleanup);
+  process.on("exit", cleanup);
+  res.raw.on("finish", cleanup);
+  return stream;
 }

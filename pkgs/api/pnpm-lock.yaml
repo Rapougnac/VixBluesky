@@ -17,6 +17,12 @@ importers:
       fluent-ffmpeg:
         specifier: ^2.1.3
         version: 2.1.3
+      hls-parser:
+        specifier: ^0.13.3
+        version: 0.13.3
+      stream-buffers:
+        specifier: ^3.0.3
+        version: 3.0.3
     devDependencies:
       '@types/fluent-ffmpeg':
         specifier: ^2.1.26
@@ -24,6 +30,9 @@ importers:
       '@types/node':
         specifier: ^22.5.4
         version: 22.5.4
+      '@types/stream-buffers':
+        specifier: ^3.0.7
+        version: 3.0.7
       pino-pretty:
         specifier: ^11.2.2
         version: 11.2.2
@@ -57,6 +66,9 @@ packages:
 
   '@types/node@22.5.4':
     resolution: {integrity: sha512-FDuKUJQm/ju9fT/SeX/6+gBzoPzlVCzfzmGkwKvRHQVxi4BntVbyIwf6a4Xn62mrvndLiml6z/UBXIdEVjQLXg==}
+
+  '@types/stream-buffers@3.0.7':
+    resolution: {integrity: sha512-azOCy05sXVXrO+qklf0c/B07H/oHaIuDDAiHPVwlk3A9Ek+ksHyTeMajLZl3r76FxpPpxem//4Te61G1iW3Giw==}
 
   abort-controller@3.0.0:
     resolution: {integrity: sha512-h8lQ8tacZYnR3vNQTgibj+tODHI5/+l06Au2Pcriv/Gmet0eaj4TwWH41sO9wnHDiQsEj19q0drzdWdeAHtweg==}
@@ -204,6 +216,9 @@ packages:
   help-me@5.0.0:
     resolution: {integrity: sha512-7xgomUX6ADmcYzFik0HzAxh/73YlKR9bmFzf51CZwR+b6YtzU2m0u49hQCqV6SvlqIqsaxovfwdvbnsw3b/zpg==}
 
+  hls-parser@0.13.3:
+    resolution: {integrity: sha512-DXqW7bwx9j2qFcAXS/LBJTDJWitxknb6oUnsnTvECHrecPvPbhRgIu45OgNDUU6gpwKxMJx40SHRRUUhdIM2gA==}
+
   http-response-object@3.0.2:
     resolution: {integrity: sha512-bqX0XTF6fnXSQcEJ2Iuyr75yVakyjIDCqroJQ/aHfSdlM743Cwqoi2nDYMzLGWUcuTWGWy8AAvOKXTfiv6q9RA==}
 
@@ -346,6 +361,10 @@ packages:
     resolution: {integrity: sha512-UcjcJOWknrNkF6PLX83qcHM6KHgVKNkV62Y8a5uYDVv9ydGQVwAHMKqHdJje1VTWpljG0WYpCDhrCdAOYH4TWg==}
     engines: {node: '>= 10.x'}
 
+  stream-buffers@3.0.3:
+    resolution: {integrity: sha512-pqMqwQCso0PBJt2PQmDO0cFj0lyqmiwOMiMSkVtRokl7e+ZTRYgDHKnuZNbqjiJXgsg4nuqtD/zxuo9KqTp0Yw==}
+    engines: {node: '>= 0.10.0'}
+
   string_decoder@1.3.0:
     resolution: {integrity: sha512-hkRX8U1WjJFd8LsDJ2yQ/wWWxaopEsABU1XfkM8A+j0+85JAGppt16cr1Whg6KIbb4okU6Mql6BOj+uup/wKeA==}
 
@@ -415,6 +434,10 @@ snapshots:
   '@types/node@22.5.4':
     dependencies:
       undici-types: 6.19.8
+
+  '@types/stream-buffers@3.0.7':
+    dependencies:
+      '@types/node': 22.5.4
 
   abort-controller@3.0.0:
     dependencies:
@@ -567,6 +590,8 @@ snapshots:
 
   help-me@5.0.0: {}
 
+  hls-parser@0.13.3: {}
+
   http-response-object@3.0.2:
     dependencies:
       '@types/node': 10.17.60
@@ -713,6 +738,8 @@ snapshots:
       atomic-sleep: 1.0.0
 
   split2@4.2.0: {}
+
+  stream-buffers@3.0.3: {}
 
   string_decoder@1.3.0:
     dependencies:

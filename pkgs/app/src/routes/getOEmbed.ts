@@ -23,11 +23,12 @@ export const getOEmbed: Handler<Env, "/oembed"> = async (c) => {
   }
 
   if (type === OEmbedTypes.Post) {
-    const { replies, reposts, likes } = c.req.query();
+    const { replies, reposts, likes, videoUrl } = c.req.query();
 
     return c.json({
-      author_name: `🗨️ ${replies}    ♻️ ${reposts}    💙 ${likes}`,
       ...defaults,
+      author_name: `🗨️ ${replies}    ♻️ ${reposts}    💙 ${likes}`,
+      provider_url: videoUrl ? videoUrl : defaults.provider_url,
     });
   }
   if (type === OEmbedTypes.Profile) {
