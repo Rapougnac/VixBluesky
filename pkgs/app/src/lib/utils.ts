@@ -15,4 +15,7 @@ export const checkType = (t: string, o: any) =>
   (typeof o?.$type === "string" && o?.$type.startsWith(t)) || o?.$type === t;
 
 export const indent = (s: string, n: number) =>
-  s.split("\n").map((l) => " ".repeat(n) + l).join("\n");
+  s
+    .split("\n")
+    .map((l) => " ".repeat(n) + l)
+    .join("\n");
