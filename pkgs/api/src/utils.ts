@@ -1,7 +1,7 @@
 import { type ChildProcess, spawn as s } from "node:child_process";
 
 import { type FastifyReply } from "fastify";
-import ffmpeg from "ffmpeg-static";
+import type { Writable, Readable } from "node:stream";
 
 export function bufferVideo(masterUrl: string, res: FastifyReply) {
   let process: ChildProcess;
@@ -29,17 +29,25 @@ export function bufferVideo(masterUrl: string, res: FastifyReply) {
     "pipe:3",
   ];
 
-  console.log(ffmpeg, args);
-
-  process = s(...[ffmpeg!, args], {
+  process = s("ffmpeg", args, {
     windowsHide: true,
     stdio: ["inherit", "inherit", "inherit", "pipe"],
   });
 
   const [, , , stream] = process.stdio;
-  stream?.pipe(res.raw);
+  pipe(stream, res.raw, cleanup);
   process.on("close", cleanup);
   process.on("exit", cleanup);
   res.raw.on("finish", cleanup);
   return stream;
+}
+
+function pipe(
+  from: Readable | Writable | undefined | null,
+  to: NodeJS.WritableStream,
+  cleanup: () => void
+) {
+  from?.on("error", cleanup).on("close", cleanup);
+  to.on("error", cleanup).on("close", cleanup);
+  from?.pipe(to);
 }

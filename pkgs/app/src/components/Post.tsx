@@ -28,7 +28,7 @@ const constructVideoUrl = (streamInfo: StreamInfo, apiUrl: string) => {
 
   const parts = [did, id, quality];
 
-  return `${apiUrl}${btoa(join(parts, ";"))}.mp4`;
+  return `${apiUrl}generate/${btoa(join(parts, ";"))}.mp4`;
 };
 
 const Video = ({
@@ -124,7 +124,7 @@ export const Post = ({
     post.embed?.media ?? post.embed
   );
   const streamInfo = videoMetadata?.at(-1);
-  const isTooLong = streamInfo!.uri.length > 4;
+  const isTooLong = isVideo && streamInfo!.uri.length > 4;
   const shouldOverrideForVideo = isVideo && isTooLong;
 
   let videoUrl;
