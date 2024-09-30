@@ -38,7 +38,7 @@ app.get("/", async (_, res) => res.redirect("https://bskyx.app"));
 app.get("/favicon.ico", (_, res) => res.send(""));
 
 app.get<{ Params: { "*": string } }>(
-  "/*",
+  "/generate/*",
   {
     schema: {
       params: {
@@ -50,20 +50,28 @@ app.get<{ Params: { "*": string } }>(
       },
     },
   },
-  async (req, res) => {
-    const payload = Buffer.from(req.params["*"], "base64")
-      .toString()
-      .split(";");
+  (req, res) => {
+    let baseUrl = req.params["*"];
+    if (baseUrl.endsWith(".mp4")) {
+      baseUrl = baseUrl.slice(0, -4);
+    }
+
+    const payload = Buffer.from(baseUrl, "base64").toString().split(";");
 
     const [did, id, quality] = payload;
+
+    if (!did?.startsWith("did") || !id || !quality) {
+      // Legacy/Invalid payload
+      return res.status(400).send({ error: "Invalid payload" });
+    }
 
     const url = `https://video.bsky.app/watch/${did}/${id}/${quality}/video.m3u8`;
 
     try {
-      bufferVideo(url, res);
-
       res.header("Content-Type", "video/mp4");
       res.header("Cache-Control", "public, max-age=604800");
+      res.header('Connection', 'keep-alive');
+      bufferVideo(url, res);
       return res;
     } catch (error) {
       console.error(error);
