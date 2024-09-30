@@ -10,6 +10,11 @@ Embed Bluesky links in Discord.
 
 #### Simply append `x` at the end of `bsky.app`.
 
+## FAQ
+
+### [Video is too long to embed] in an embed description.
+Due to Discord's and BlueSky limitations, the video cannot be embedded if it exceeds ~30s. You can still view the video by clicking on the `VixBluesky` in the author field. 
+
 ## Authors
 
 - [@ItsRauf](https://www.github.com/ItsRauf) - Original author

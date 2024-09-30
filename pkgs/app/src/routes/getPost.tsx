@@ -2,7 +2,7 @@ import { Handler } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { fetchPost } from "../lib/fetchPostData";
 import { Post } from "../components/Post";
-import { processVideoEmbed, StreamInfo, VideoMedia } from "../lib/processVideoEmbed";
+import { processVideoEmbed, StreamInfo } from "../lib/processVideoEmbed";
 import { checkType } from "../lib/utils";
 
 export const getPost: Handler<
@@ -27,8 +27,10 @@ export const getPost: Handler<
     checkType("app.bsky.embed.video", fetchedPost.embed) ||
     checkType("app.bsky.embed.video", fetchedPost.embed?.media)
   ) {
-    // @ts-expect-error
-    videoMetaData = await processVideoEmbed(fetchedPost.embed?.media || fetchedPost.embed);
+    videoMetaData = await processVideoEmbed(
+      // @ts-expect-error
+      fetchedPost.embed?.media ?? fetchedPost.embed
+    );
   }
 
   return c.html(

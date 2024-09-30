@@ -5,7 +5,7 @@ import { OEmbedTypes } from "../routes/getOEmbed";
 import { parseEmbedImages } from "../lib/parseEmbedImages";
 import { parseEmbedDescription } from "../lib/parseEmbedDescription";
 import { StreamInfo } from "../lib/processVideoEmbed";
-import { join } from "../lib/utils";
+import { checkType, join } from "../lib/utils";
 
 interface PostProps {
   post: AppBskyFeedDefs.PostView;
@@ -21,6 +21,16 @@ const Meta = ({ post }: { post: AppBskyFeedDefs.PostView }) => (
   </>
 );
 
+const constructVideoUrl = (streamInfo: StreamInfo, apiUrl: string) => {
+  const url = new URL(streamInfo.masterUri);
+
+  const [did, id, quality] = url.pathname.split("/").slice(2);
+
+  const parts = [did, id, quality];
+
+  return `${apiUrl}generate/${btoa(join(parts, ";"))}.mp4`;
+};
+
 const Video = ({
   streamInfo,
   apiUrl,
@@ -34,8 +44,7 @@ const Video = ({
   post: AppBskyFeedDefs.PostView;
   description: string;
 }) => {
-  // Discord can't handle query params in the URL, so i have to do this 🔥beautiful mess🔥
-  const url = `${apiUrl}generate/${btoa(join(streamInfo.uri, ";"))}.mp4`;
+  const url = constructVideoUrl(streamInfo, apiUrl);
 
   return (
     <>
@@ -109,7 +118,21 @@ export const Post = ({
 }: PostProps) => {
   const images = parseEmbedImages(post);
   const isAuthor = images === post.author.avatar;
-  const description = parseEmbedDescription(post);
+  let description = parseEmbedDescription(post);
+  const isVideo = checkType(
+    "app.bsky.embed.video",
+    post.embed?.media ?? post.embed
+  );
+  const streamInfo = videoMetadata?.at(-1);
+  const isTooLong = isVideo && streamInfo!.uri.length > 4;
+  const shouldOverrideForVideo = isVideo && isTooLong;
+
+  let videoUrl;
+
+  if (isVideo && isTooLong) {
+    videoUrl = constructVideoUrl(streamInfo!, apiUrl);
+    description += `\n[Video is too long to embed!]`;
+  }
 
   return (
     <Layout url={url}>
@@ -125,23 +148,24 @@ export const Post = ({
       />
       <meta property="og:updated_time" content={post.indexedAt} />
       <meta property="article:published_time" content={post.indexedAt} />
-      {/* <meta property="og:image" content={post.author.avatar} /> */}
 
       {!isAuthor && <Meta post={post} />}
 
-      {images.length !== 0 && !videoMetadata && <Images images={images} />}
+      {images.length !== 0 && (shouldOverrideForVideo || !isVideo) && (
+        <Images images={images} />
+      )}
 
-      {videoMetadata && (
+      {isVideo && streamInfo!.uri.length <= 4 && (
         <Video
           apiUrl={apiUrl}
-          streamInfo={videoMetadata.at(-1)!}
+          streamInfo={streamInfo!}
           appDomain={appDomain}
           description={description}
           post={post}
         />
       )}
 
-      {!videoMetadata && (
+      {(shouldOverrideForVideo || !isVideo) && (
         <link
           rel="alternate"
           type="application/json+oembed"
@@ -151,7 +175,9 @@ export const Post = ({
             post.likeCount
           }&avatar=${encodeURIComponent(
             post.author.avatar ?? ""
-          )}&description=${encodeURIComponent(description)}`}
+          )}&description=${encodeURIComponent(description)}${
+            videoUrl ? `&videoUrl=${encodeURIComponent(videoUrl)}` : ""
+          }`}
         />
       )}
     </Layout>

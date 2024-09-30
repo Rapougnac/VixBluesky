@@ -8,6 +8,7 @@ export interface StreamInfo {
   };
   codecs: string;
   uri: string | string[];
+  masterUri: string;
 }
 
 export interface M3U8Data {
@@ -66,6 +67,7 @@ async function parseM3U8(
         },
         codecs: "",
         uri: "",
+        masterUri: "",
       };
 
       for (const attrib of attribs) {
@@ -88,6 +90,8 @@ async function parseM3U8(
     } else if (line.includes("m3u8")) {
       const resolvedUrl = `${initalUrl}/${line}`;
 
+      streams.at(-1)!.masterUri = resolvedUrl;
+
       const cont = await fetch(resolvedUrl).then((res) => res.text());
 
       const parsed = await parseM3U8(removeLastPathSegment(resolvedUrl), cont);
@@ -102,6 +106,7 @@ async function parseM3U8(
         },
         codecs: "",
         uri: `${initalUrl}/${line}`,
+        masterUri: initalUrl,
       });
     } else {
       // Discard
