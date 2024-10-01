@@ -13,7 +13,7 @@ Embed Bluesky links in Discord.
 ## Direct Links
 
 You want to link to a media directly? You can prepend `r.` to the URL to get a direct link.
-![Direct Link](./.github/raw-link.png)
+![Direct Link](./.github/README/raw-link.png)
 
 ## FAQ
 
