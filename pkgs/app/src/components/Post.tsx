@@ -2,10 +2,9 @@ import { AppBskyEmbedImages, AppBskyFeedDefs } from "@atproto/api";
 
 import { Layout } from "./Layout";
 import { OEmbedTypes } from "../routes/getOEmbed";
-import { parseEmbedImages } from "../lib/parseEmbedImages";
 import { parseEmbedDescription } from "../lib/parseEmbedDescription";
 import { StreamInfo } from "../lib/processVideoEmbed";
-import { checkType, join } from "../lib/utils";
+import { checkType, join, constructVideoUrl } from "../lib/utils";
 
 interface PostProps {
   post: AppBskyFeedDefs.PostView;
@@ -13,6 +12,7 @@ interface PostProps {
   appDomain: string;
   videoMetadata?: StreamInfo[] | undefined;
   apiUrl: string;
+  images: string | AppBskyEmbedImages.ViewImage[];
 }
 
 const Meta = ({ post }: { post: AppBskyFeedDefs.PostView }) => (
@@ -20,16 +20,6 @@ const Meta = ({ post }: { post: AppBskyFeedDefs.PostView }) => (
     <meta name="twitter:card" content="summary_large_image" />
   </>
 );
-
-const constructVideoUrl = (streamInfo: StreamInfo, apiUrl: string) => {
-  const url = new URL(streamInfo.masterUri);
-
-  const [did, id, quality] = url.pathname.split("/").slice(2);
-
-  const parts = [did, id, quality];
-
-  return `${apiUrl}generate/${btoa(join(parts, ";"))}.mp4`;
-};
 
 const Video = ({
   streamInfo,
@@ -115,8 +105,8 @@ export const Post = ({
   appDomain,
   videoMetadata,
   apiUrl,
+  images,
 }: PostProps) => {
-  const images = parseEmbedImages(post);
   const isAuthor = images === post.author.avatar;
   let description = parseEmbedDescription(post);
   const isVideo = checkType(

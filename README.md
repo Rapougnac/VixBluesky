@@ -10,6 +10,11 @@ Embed Bluesky links in Discord.
 
 #### Simply append `x` at the end of `bsky.app`.
 
+## Direct Links
+
+You want to link to a media directly? You can prepend `r.` to the URL to get a direct link.
+![Direct Link](./.github/raw-link.png)
+
 ## FAQ
 
 ### [Video is too long to embed] in an embed description.

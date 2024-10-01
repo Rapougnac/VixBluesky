@@ -1,3 +1,5 @@
+import { StreamInfo } from "./processVideoEmbed";
+
 export const concatQueryParams = (params: Record<string, string | string[]>) =>
   Object.entries(params)
     .map(([key, value]) => {
@@ -19,3 +21,13 @@ export const indent = (s: string, n: number) =>
     .split("\n")
     .map((l) => " ".repeat(n) + l)
     .join("\n");
+
+export const constructVideoUrl = (streamInfo: StreamInfo, apiUrl: string) => {
+  const url = new URL(streamInfo.masterUri);
+
+  const [did, id, quality] = url.pathname.split("/").slice(2);
+
+  const parts = [did, id, quality];
+
+  return `${apiUrl}generate/${btoa(join(parts, ";"))}.mp4`;
+};
