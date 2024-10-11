@@ -1,4 +1,4 @@
-import { BskyAgent } from "@atproto/api";
+import { XRPC } from "@atcute/client";
 import type { KVNamespace } from "@cloudflare/workers-types";
 
 declare global {
@@ -12,7 +12,7 @@ declare global {
       bskyx: KVNamespace;
     };
     Variables: {
-      Agent: BskyAgent;
+      Agent: XRPC;
     };
   }
 }

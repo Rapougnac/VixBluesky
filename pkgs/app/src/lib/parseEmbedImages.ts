@@ -1,56 +1,50 @@
-import {
-  AppBskyEmbedImages,
-  AppBskyEmbedRecord,
-  AppBskyEmbedRecordWithMedia,
-  AppBskyFeedDefs,
-} from "@atproto/api";
+import { AppBskyFeedDefs, AppBskyEmbedImages } from "@atcute/client/lexicons";
+import { checkType } from "./utils";
 
 export function parseEmbedImages(
   post: AppBskyFeedDefs.PostView
 ): string | AppBskyEmbedImages.ViewImage[] {
   let images: AppBskyEmbedImages.ViewImage[] = [];
 
-  if (AppBskyEmbedRecord.isView(post.embed)) {
-    const { success: isView } = AppBskyEmbedRecord.validateView(post.embed);
-    if (isView && AppBskyEmbedRecord.isViewRecord(post.embed.record)) {
-      const { success: isViewRecord } = AppBskyEmbedRecord.validateViewRecord(
-        post.embed.record
-      );
+  const embed = post.embed as typeof post.embed & {
+    record: any;
+    media: any;
+    images: any;
+    external: any;
+  };
+
+  if (checkType("app.bsky.embed.record#view", embed)) {
+    if (checkType("app.bsky.embed.record#viewRecord", embed?.record)) {
       if (
-        isViewRecord &&
-        post.embed.record.embeds &&
-        AppBskyEmbedImages.isView(post.embed.record.embeds[0])
+        embed?.record.embeds &&
+        checkType("app.bsky.embed.images#view", embed.record.embeds[0])
       ) {
-        const { success: isImageView } = AppBskyEmbedImages.validateView(
-          post.embed.record.embeds[0]
-        );
-        if (isImageView) {
-          images = [...images, ...post.embed.record.embeds[0].images];
-        }
+        images = [
+          ...images,
+          ...(embed.record.embeds[0].images as AppBskyEmbedImages.ViewImage[]),
+        ];
       }
     }
   }
-  if (AppBskyEmbedRecordWithMedia.isView(post.embed)) {
-    const { success: isView } = AppBskyEmbedRecordWithMedia.validateView(
-      post.embed
-    );
-    if (isView && AppBskyEmbedImages.isView(post.embed.media)) {
-      const { success: isImageView } = AppBskyEmbedImages.validateView(
-        post.embed.media
-      );
-      if (isImageView) {
-        images = [...images, ...post.embed.media.images];
-      }
+  if (checkType("app.bsky.embed.recordWithMedia#view", embed)) {
+    if (checkType("app.bsky.embed.images#view", embed.media)) {
+      images = [
+        ...images,
+        ...(embed.media.images as AppBskyEmbedImages.ViewImage[]),
+      ];
     }
   }
-  if (AppBskyEmbedImages.isView(post.embed)) {
-    const { success: isImageView } = AppBskyEmbedImages.validateView(
-      post.embed
-    );
-    if (isImageView) {
-      images = [...images, ...post.embed.images];
+  if (checkType("app.bsky.embed.images#view", embed)) {
+    images = [...images, ...embed.images];
+  }
+
+  const isEmptyImages = images.length === 0;
+
+  if (isEmptyImages) {
+    if (checkType("app.bsky.embed.external#view", embed)) {
+      return embed.external.uri;
     }
   }
 
-  return images.length === 0 ? post.author.avatar ?? "" : images;
+  return isEmptyImages ? post.author.avatar ?? "" : images;
 }

@@ -5,12 +5,13 @@ import { OEmbedTypes } from "../routes/getOEmbed";
 import { parseEmbedDescription } from "../lib/parseEmbedDescription";
 import { StreamInfo } from "../lib/processVideoEmbed";
 import { checkType, join, constructVideoUrl } from "../lib/utils";
+import { VideoInfo } from "../routes/getPost";
 
 interface PostProps {
   post: AppBskyFeedDefs.PostView;
   url: string;
   appDomain: string;
-  videoMetadata?: StreamInfo[] | undefined;
+  videoMetadata?: VideoInfo;
   apiUrl: string;
   images: string | AppBskyEmbedImages.ViewImage[];
 }
@@ -28,13 +29,13 @@ const Video = ({
   post,
   description,
 }: {
-  streamInfo: StreamInfo;
+  streamInfo: VideoInfo;
   apiUrl: string;
   appDomain: string;
   post: AppBskyFeedDefs.PostView;
   description: string;
 }) => {
-  const url = constructVideoUrl(streamInfo, apiUrl);
+  const url = streamInfo.url.toString();
 
   return (
     <>
@@ -47,19 +48,19 @@ const Video = ({
       <meta property="og:video:type" content="video/mp4" />
       <meta
         property="og:video:width"
-        content={streamInfo.resolution.width.toString()}
+        content={streamInfo.aspectRatio.width.toString()}
       />
       <meta
         property="og:video:height"
-        content={streamInfo.resolution.height.toString()}
+        content={streamInfo.aspectRatio.height.toString()}
       />
       <meta
         property="twitter:player:width"
-        content={streamInfo.resolution.width.toString()}
+        content={streamInfo.aspectRatio.width.toString()}
       />
       <meta
         property="twitter:player:height"
-        content={streamInfo.resolution.height.toString()}
+        content={streamInfo.aspectRatio.height.toString()}
       />
 
       <link
@@ -113,16 +114,15 @@ export const Post = ({
     "app.bsky.embed.video",
     post.embed?.media ?? post.embed
   );
-  const streamInfo = videoMetadata?.at(-1);
-  const isTooLong = isVideo && streamInfo!.uri.length > 4;
-  const shouldOverrideForVideo = isVideo && isTooLong;
+  // const isTooLong = isVideo && streamInfo!.uri.length > 4;
+  // const shouldOverrideForVideo = isVideo && isTooLong;
 
   let videoUrl;
 
-  if (isVideo && isTooLong) {
-    videoUrl = constructVideoUrl(streamInfo!, apiUrl);
-    description += `\n[Video is too long to embed!]`;
-  }
+  // if (isVideo && isTooLong) {
+  //   videoUrl = constructVideoUrl(streamInfo!, apiUrl);
+  //   description += `\n[Video is too long to embed!]`;
+  // }
 
   return (
     <Layout url={url}>
@@ -141,21 +141,21 @@ export const Post = ({
 
       {!isAuthor && <Meta post={post} />}
 
-      {images.length !== 0 && (shouldOverrideForVideo || !isVideo) && (
+      {images.length !== 0 && !isVideo && (
         <Images images={images} />
       )}
 
-      {isVideo && streamInfo!.uri.length <= 4 && (
+      {isVideo && (
         <Video
           apiUrl={apiUrl}
-          streamInfo={streamInfo!}
+          streamInfo={videoMetadata!}
           appDomain={appDomain}
           description={description}
           post={post}
         />
       )}
 
-      {(shouldOverrideForVideo || !isVideo) && (
+      {!isVideo && (
         <link
           rel="alternate"
           type="application/json+oembed"

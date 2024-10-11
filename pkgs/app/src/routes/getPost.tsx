@@ -2,9 +2,28 @@ import { Handler } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { fetchPost } from "../lib/fetchPostData";
 import { Post } from "../components/Post";
-import { processVideoEmbed, StreamInfo } from "../lib/processVideoEmbed";
 import { parseEmbedImages } from "../lib/parseEmbedImages";
-import { checkType, constructVideoUrl } from "../lib/utils";
+import { checkType } from "../lib/utils";
+import { AppBskyFeedGetPosts } from "@atcute/client/lexicons";
+
+export interface VideoInfo {
+  url: URL;
+  aspectRatio: {
+    width: number;
+    height: number;
+  };
+}
+
+interface VideoEmbed {
+  $type: string;
+  cid: string;
+  playlist: string;
+  thumbnail: string;
+  aspectRatio: {
+    width: number;
+    height: number;
+  };
+}
 
 export const getPost: Handler<
   Env,
@@ -14,11 +33,11 @@ export const getPost: Handler<
   const isDirect = c.req.query("direct");
 
   const agent = c.get("Agent");
-  const { data, success } = await fetchPost(agent, { user, post });
-
-  if (!success) {
+  try {
+    var { data } = await fetchPost(agent, { user, post });
+  } catch (e) {
     throw new HTTPException(500, {
-      message: "Failed to fetch the post!",
+      message: `Failed to fetch the post!\n${e}`,
     });
   }
 
@@ -26,16 +45,21 @@ export const getPost: Handler<
 
   const images = parseEmbedImages(fetchedPost);
 
-  let videoMetaData: StreamInfo[] | undefined;
+  let videoMetaData: VideoInfo | undefined;
+
+  const embed = fetchedPost.embed as typeof fetchedPost.embed & { media: any };
 
   if (
-    checkType("app.bsky.embed.video", fetchedPost.embed) ||
-    checkType("app.bsky.embed.video", fetchedPost.embed?.media)
+    checkType("app.bsky.embed.video", embed) ||
+    checkType("app.bsky.embed.video", embed?.media)
   ) {
-    videoMetaData = await processVideoEmbed(
-      // @ts-expect-error
-      fetchedPost.embed?.media ?? fetchedPost.embed
-    );
+    const videoEmbed = (embed?.media ?? fetchedPost.embed) as VideoEmbed;
+    videoMetaData = {
+      url: new URL(
+        `https://bsky.social/xrpc/com.atproto.sync.getBlob?cid=${videoEmbed.cid}&did=${fetchedPost.author.did}`
+      ),
+      aspectRatio: videoEmbed.aspectRatio,
+    };
   }
 
   if (!isDirect) {
@@ -57,11 +81,6 @@ export const getPost: Handler<
   }
 
   if (videoMetaData) {
-    const videoUrl = constructVideoUrl(
-      videoMetaData[0],
-      c.env.VIXBLUESKY_API_URL
-    );
-    
-    return c.redirect(videoUrl);
+    return c.redirect(videoMetaData.url.toString());
   }
 };

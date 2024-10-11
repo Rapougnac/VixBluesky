@@ -9,12 +9,14 @@ export const getProfile: Handler<
 > = async (c) => {
   const { user } = c.req.param();
   const agent = c.get("Agent");
-  const { data, success } = await fetchProfile(agent, { user });
-  if (!success) {
+  try {
+    var { data } = await fetchProfile(agent, { user });
+  } catch (e) {
     throw new HTTPException(500, {
-      message: "Failed to fetch the profile!",
+      message: `Failed to fetch the profile!\n${e}`,
     });
   }
+
   return c.html(
     <Profile
       profile={data}

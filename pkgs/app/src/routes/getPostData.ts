@@ -9,11 +9,13 @@ export const getPostData: Handler<
 > = async (c) => {
   const { user, post } = c.req.param();
   const agent = c.get("Agent");
-  const { data, success } = await fetchPost(agent, { user, post });
-  if (!success) {
+  try {
+    var { data } = await fetchPost(agent, { user, post });
+  } catch (e) {
     throw new HTTPException(500, {
-      message: "Failed to fetch the post!",
+      message: `Failed to fetch the post!\n${e}`,
     });
   }
+
   return c.json(data);
 };

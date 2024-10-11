@@ -15,11 +15,6 @@ Embed Bluesky links in Discord.
 You want to link to a media directly? You can prepend `r.` to the URL to get a direct link.
 ![Direct Link](./.github/README/raw-media.png)
 
-## FAQ
-
-### [Video is too long to embed] in an embed description.
-Due to Discord's and BlueSky limitations, the video cannot be embedded if it exceeds ~30s. You can still view the video by clicking on the `VixBluesky` in the author field. 
-
 ## Authors
 
 - [@ItsRauf](https://www.github.com/ItsRauf) - Original author

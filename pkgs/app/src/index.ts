@@ -1,5 +1,7 @@
 import { Hono } from "hono";
-import { AtpSessionData, BskyAgent } from "@atproto/api";
+// import { BskyAgent } from "@atproto/api";
+import { XRPC, CredentialManager, AtpSessionData } from "@atcute/client";
+import "@atcute/bluesky/lexicons";
 import { getPost } from "./routes/getPost";
 import { getPostData } from "./routes/getPostData";
 import { getOEmbed } from "./routes/getOEmbed";
@@ -10,21 +12,26 @@ import { HTTPException } from "hono/http-exception";
 const app = new Hono<Env>();
 
 app.use("*", async (c, next) => {
-  const agent = new BskyAgent({
+  const creds = new CredentialManager({
     service: c.env.BSKY_SERVICE_URL,
-    async persistSession(_, session) {
-      if (session) {
-        return c.env.bskyx.put("session", JSON.stringify(session));
-      }
+    onRefresh(session) {
+      return c.env.bskyx.put("session", JSON.stringify(session));
+    },
+    onExpired(session) {
+      return c.env.bskyx.delete("session");
+    },
+    onSessionUpdate(session) {
+      return c.env.bskyx.put("session", JSON.stringify(session));
     },
   });
+  const agent = new XRPC({ handler: creds });
   try {
     const rawSession = await c.env.bskyx.get("session");
     if (rawSession) {
       const session = JSON.parse(rawSession) as AtpSessionData;
-      await agent.resumeSession(session);
+      await creds.resume(session);
     } else {
-      await agent.login({
+      await creds.login({
         identifier: c.env.BSKY_AUTH_USERNAME,
         password: c.env.BSKY_AUTH_PASSWORD,
       });

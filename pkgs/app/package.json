@@ -4,7 +4,8 @@
     "deploy": "wrangler deploy --minify src/index.ts"
   },
   "dependencies": {
-    "@atproto/api": "^0.12.24",
+    "@atcute/bluesky": "^1.0.7",
+    "@atcute/client": "^2.0.3",
     "hono": "^4.5.1"
   },
   "devDependencies": {
