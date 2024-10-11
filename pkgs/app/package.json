@@ -4,11 +4,13 @@
     "deploy": "wrangler deploy --minify src/index.ts"
   },
   "dependencies": {
-    "@atproto/api": "^0.12.24",
+    "@atcute/bluesky": "^1.0.7",
+    "@atcute/client": "^2.0.3",
     "hono": "^4.5.1"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20230628.0",
+    "prettier": "^3.3.3",
     "typescript": "^5.1.6",
     "wrangler": "^3.75.0"
   }

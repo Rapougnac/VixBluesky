@@ -1,7 +1,6 @@
-import { AppBskyActorDefs } from "@atproto/api";
-
-import { Layout } from "./Layout";
-import { OEmbedTypes } from "../routes/getOEmbed";
+import { Layout } from './Layout';
+import { OEmbedTypes } from '../routes/getOEmbed';
+import { AppBskyActorDefs } from '@atcute/client/lexicons';
 
 interface ProfileProps {
   profile: AppBskyActorDefs.ProfileViewDetailed;
@@ -13,7 +12,7 @@ export const Profile = ({ profile, url, appDomain }: ProfileProps) => (
   <Layout url={url}>
     <meta name="og:type" content="article" />
     <meta name="twitter:creator" content={`@${profile.handle}`} />
-    <meta property="og:description" content={profile.description ?? ""} />
+    <meta property="og:description" content={profile.description ?? ''} />
     <meta
       property="og:title"
       content={`${profile.displayName} (@${profile.handle})`}
@@ -26,7 +25,7 @@ export const Profile = ({ profile, url, appDomain }: ProfileProps) => (
       href={`https://${appDomain}/oembed?type=${OEmbedTypes.Profile}&follows=${
         profile.followsCount
       }&posts=${profile.postsCount}&avatar=${encodeURIComponent(
-        profile.avatar ?? ""
+        profile.avatar ?? '',
       )}`}
     />
   </Layout>

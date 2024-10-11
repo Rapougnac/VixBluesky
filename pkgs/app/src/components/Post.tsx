@@ -1,18 +1,17 @@
-import { AppBskyEmbedImages, AppBskyFeedDefs } from "@atproto/api";
-
-import { Layout } from "./Layout";
-import { OEmbedTypes } from "../routes/getOEmbed";
-import { parseEmbedImages } from "../lib/parseEmbedImages";
-import { parseEmbedDescription } from "../lib/parseEmbedDescription";
-import { StreamInfo } from "../lib/processVideoEmbed";
-import { checkType, join } from "../lib/utils";
+import { Layout } from './Layout';
+import { OEmbedTypes } from '../routes/getOEmbed';
+import { parseEmbedDescription } from '../lib/parseEmbedDescription';
+import { checkType } from '../lib/utils';
+import { VideoInfo } from '../routes/getPost';
+import { AppBskyEmbedImages, AppBskyFeedDefs } from '@atcute/client/lexicons';
 
 interface PostProps {
   post: AppBskyFeedDefs.PostView;
   url: string;
   appDomain: string;
-  videoMetadata?: StreamInfo[] | undefined;
+  videoMetadata?: VideoInfo;
   apiUrl: string;
+  images: string | AppBskyEmbedImages.ViewImage[];
 }
 
 const Meta = ({ post }: { post: AppBskyFeedDefs.PostView }) => (
@@ -21,16 +20,6 @@ const Meta = ({ post }: { post: AppBskyFeedDefs.PostView }) => (
   </>
 );
 
-const constructVideoUrl = (streamInfo: StreamInfo, apiUrl: string) => {
-  const url = new URL(streamInfo.masterUri);
-
-  const [did, id, quality] = url.pathname.split("/").slice(2);
-
-  const parts = [did, id, quality];
-
-  return `${apiUrl}generate/${btoa(join(parts, ";"))}.mp4`;
-};
-
 const Video = ({
   streamInfo,
   apiUrl,
@@ -38,13 +27,13 @@ const Video = ({
   post,
   description,
 }: {
-  streamInfo: StreamInfo;
+  streamInfo: VideoInfo;
   apiUrl: string;
   appDomain: string;
   post: AppBskyFeedDefs.PostView;
   description: string;
 }) => {
-  const url = constructVideoUrl(streamInfo, apiUrl);
+  const url = streamInfo.url.toString();
 
   return (
     <>
@@ -57,19 +46,19 @@ const Video = ({
       <meta property="og:video:type" content="video/mp4" />
       <meta
         property="og:video:width"
-        content={streamInfo.resolution.width.toString()}
+        content={streamInfo.aspectRatio.width.toString()}
       />
       <meta
         property="og:video:height"
-        content={streamInfo.resolution.height.toString()}
+        content={streamInfo.aspectRatio.height.toString()}
       />
       <meta
         property="twitter:player:width"
-        content={streamInfo.resolution.width.toString()}
+        content={streamInfo.aspectRatio.width.toString()}
       />
       <meta
         property="twitter:player:height"
-        content={streamInfo.resolution.height.toString()}
+        content={streamInfo.aspectRatio.height.toString()}
       />
 
       <link
@@ -80,7 +69,7 @@ const Video = ({
         }&reposts=${post.repostCount}&likes=${
           post.likeCount
         }&avatar=${encodeURIComponent(
-          post.author.avatar ?? ""
+          post.author.avatar ?? '',
         )}&description=${encodeURIComponent(description)}`}
       />
     </>
@@ -93,7 +82,7 @@ const Images = ({
   images: AppBskyEmbedImages.ViewImage[] | string;
 }) => (
   <>
-    {typeof images === "string" ? (
+    {typeof images === 'string' ? (
       <>
         <meta property="og:image" content={images} />
         <meta property="twitter:image" content={images} />
@@ -115,24 +104,17 @@ export const Post = ({
   appDomain,
   videoMetadata,
   apiUrl,
+  images,
 }: PostProps) => {
-  const images = parseEmbedImages(post);
   const isAuthor = images === post.author.avatar;
   let description = parseEmbedDescription(post);
   const isVideo = checkType(
-    "app.bsky.embed.video",
-    post.embed?.media ?? post.embed
+    'app.bsky.embed.video',
+    // @ts-expect-error
+    post.embed?.media ?? post.embed,
   );
-  const streamInfo = videoMetadata?.at(-1);
-  const isTooLong = isVideo && streamInfo!.uri.length > 4;
-  const shouldOverrideForVideo = isVideo && isTooLong;
 
   let videoUrl;
-
-  if (isVideo && isTooLong) {
-    videoUrl = constructVideoUrl(streamInfo!, apiUrl);
-    description += `\n[Video is too long to embed!]`;
-  }
 
   return (
     <Layout url={url}>
@@ -151,21 +133,19 @@ export const Post = ({
 
       {!isAuthor && <Meta post={post} />}
 
-      {images.length !== 0 && (shouldOverrideForVideo || !isVideo) && (
-        <Images images={images} />
-      )}
+      {images.length !== 0 && !isVideo && <Images images={images} />}
 
-      {isVideo && streamInfo!.uri.length <= 4 && (
+      {isVideo && (
         <Video
           apiUrl={apiUrl}
-          streamInfo={streamInfo!}
+          streamInfo={videoMetadata!}
           appDomain={appDomain}
           description={description}
           post={post}
         />
       )}
 
-      {(shouldOverrideForVideo || !isVideo) && (
+      {!isVideo && (
         <link
           rel="alternate"
           type="application/json+oembed"
@@ -174,10 +154,8 @@ export const Post = ({
           }&reposts=${post.repostCount}&likes=${
             post.likeCount
           }&avatar=${encodeURIComponent(
-            post.author.avatar ?? ""
-          )}&description=${encodeURIComponent(description)}${
-            videoUrl ? `&videoUrl=${encodeURIComponent(videoUrl)}` : ""
-          }`}
+            post.author.avatar ?? '',
+          )}&description=${encodeURIComponent(description)}`}
         />
       )}
     </Layout>

@@ -1,40 +1,18 @@
-import {
-  AppBskyEmbedRecord,
-  AppBskyEmbedRecordWithMedia,
-  AppBskyFeedDefs,
-  AppBskyFeedPost,
-} from "@atproto/api";
-import { indent } from "./utils";
+import { AppBskyFeedDefs } from '@atcute/client/lexicons';
+import { checkType, indent } from './utils';
 
-export function parseEmbedDescription(post: AppBskyFeedDefs.PostView) {
-  if (AppBskyFeedPost.isRecord(post.record)) {
-    if (AppBskyEmbedRecord.isView(post.embed)) {
-      const { success: isView } = AppBskyEmbedRecord.validateView(post.embed);
-      if (isView && AppBskyEmbedRecord.isViewRecord(post.embed.record)) {
-        const { success: isViewRecord } = AppBskyEmbedRecord.validateViewRecord(
-          post.embed.record
-        );
-        if (isViewRecord) {
-          // @ts-expect-error For some reason the original post value is typed as {}
-          return `${post.record.text}\n\nQuoting @${post.embed.record.author.handle}\n➥${indent(post.embed.record.value.text, 2)}`;
-        }
-      }
-    }
-    if (AppBskyEmbedRecordWithMedia.isView(post.embed)) {
-      const { success: isView } = AppBskyEmbedRecordWithMedia.validateView(
-        post.embed
-      );
-      if (isView && AppBskyEmbedRecord.isViewRecord(post.embed.record.record)) {
-        const { success: isViewRecord } = AppBskyEmbedRecord.validateViewRecord(
-          post.embed.record.record
-        );
-        if (isViewRecord) {
-          // @ts-expect-error For some reason the original post value is typed as {}
-          return `${post.record.text}\n\nQuoting @${post.embed.record.record.author.handle}\n➥${indent(post.embed.record.record.value.text, 2)}`;
-        }
-      }
-    }
-    return post.record.text;
-  }
-  return "";
+export function parseEmbedDescription(post: AppBskyFeedDefs.PostView): string {
+  const isQuote =
+    checkType('app.bsky.feed.post', post.record) &&
+    (checkType('app.bsky.embed.record#view', post.embed) ||
+      checkType('app.bsky.embed.recordWithMedia#view', post.embed));
+
+  // @ts-expect-error
+  const embed = post.embed.record?.record ?? post.embed.record;
+
+  return isQuote
+    ? // @ts-expect-error
+      `${post.record.text}\n\nQuoting @${embed.author.handle}\n➥${indent(embed.value.text, 2)}`
+    : // @ts-expect-error
+      post.record.text;
 }
