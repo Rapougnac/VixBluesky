@@ -1,4 +1,4 @@
-import { Handler } from "hono";
+import { Handler } from 'hono';
 
 export enum OEmbedTypes {
   Post = 1,
@@ -6,13 +6,13 @@ export enum OEmbedTypes {
   Video,
 }
 
-export const getOEmbed: Handler<Env, "/oembed"> = async (c) => {
-  const type = +(c.req.query("type") ?? 0);
-  const avatar = c.req.query("avatar");
+export const getOEmbed: Handler<Env, '/oembed'> = async (c) => {
+  const type = +(c.req.query('type') ?? 0);
+  const avatar = c.req.query('avatar');
 
   const defaults = {
-    provider_name: "VixBluesky",
-    provider_url: "https://bskyx.app/",
+    provider_name: 'VixBluesky',
+    provider_url: 'https://bskyx.app/',
     thumbnail_width: 1000,
     thumbnail_height: 1000,
   };
@@ -23,12 +23,11 @@ export const getOEmbed: Handler<Env, "/oembed"> = async (c) => {
   }
 
   if (type === OEmbedTypes.Post) {
-    const { replies, reposts, likes, videoUrl } = c.req.query();
+    const { replies, reposts, likes } = c.req.query();
 
     return c.json({
       ...defaults,
       author_name: `🗨️ ${replies}    ♻️ ${reposts}    💙 ${likes}`,
-      provider_url: videoUrl ? videoUrl : defaults.provider_url,
     });
   }
   if (type === OEmbedTypes.Profile) {

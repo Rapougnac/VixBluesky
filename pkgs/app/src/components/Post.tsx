@@ -1,11 +1,9 @@
-import { AppBskyEmbedImages, AppBskyFeedDefs } from "@atproto/api";
-
-import { Layout } from "./Layout";
-import { OEmbedTypes } from "../routes/getOEmbed";
-import { parseEmbedDescription } from "../lib/parseEmbedDescription";
-import { StreamInfo } from "../lib/processVideoEmbed";
-import { checkType, join, constructVideoUrl } from "../lib/utils";
-import { VideoInfo } from "../routes/getPost";
+import { Layout } from './Layout';
+import { OEmbedTypes } from '../routes/getOEmbed';
+import { parseEmbedDescription } from '../lib/parseEmbedDescription';
+import { checkType } from '../lib/utils';
+import { VideoInfo } from '../routes/getPost';
+import { AppBskyEmbedImages, AppBskyFeedDefs } from '@atcute/client/lexicons';
 
 interface PostProps {
   post: AppBskyFeedDefs.PostView;
@@ -71,7 +69,7 @@ const Video = ({
         }&reposts=${post.repostCount}&likes=${
           post.likeCount
         }&avatar=${encodeURIComponent(
-          post.author.avatar ?? ""
+          post.author.avatar ?? '',
         )}&description=${encodeURIComponent(description)}`}
       />
     </>
@@ -84,7 +82,7 @@ const Images = ({
   images: AppBskyEmbedImages.ViewImage[] | string;
 }) => (
   <>
-    {typeof images === "string" ? (
+    {typeof images === 'string' ? (
       <>
         <meta property="og:image" content={images} />
         <meta property="twitter:image" content={images} />
@@ -111,18 +109,12 @@ export const Post = ({
   const isAuthor = images === post.author.avatar;
   let description = parseEmbedDescription(post);
   const isVideo = checkType(
-    "app.bsky.embed.video",
-    post.embed?.media ?? post.embed
+    'app.bsky.embed.video',
+    // @ts-expect-error
+    post.embed?.media ?? post.embed,
   );
-  // const isTooLong = isVideo && streamInfo!.uri.length > 4;
-  // const shouldOverrideForVideo = isVideo && isTooLong;
 
   let videoUrl;
-
-  // if (isVideo && isTooLong) {
-  //   videoUrl = constructVideoUrl(streamInfo!, apiUrl);
-  //   description += `\n[Video is too long to embed!]`;
-  // }
 
   return (
     <Layout url={url}>
@@ -141,9 +133,7 @@ export const Post = ({
 
       {!isAuthor && <Meta post={post} />}
 
-      {images.length !== 0 && !isVideo && (
-        <Images images={images} />
-      )}
+      {images.length !== 0 && !isVideo && <Images images={images} />}
 
       {isVideo && (
         <Video
@@ -164,10 +154,8 @@ export const Post = ({
           }&reposts=${post.repostCount}&likes=${
             post.likeCount
           }&avatar=${encodeURIComponent(
-            post.author.avatar ?? ""
-          )}&description=${encodeURIComponent(description)}${
-            videoUrl ? `&videoUrl=${encodeURIComponent(videoUrl)}` : ""
-          }`}
+            post.author.avatar ?? '',
+          )}&description=${encodeURIComponent(description)}`}
         />
       )}
     </Layout>

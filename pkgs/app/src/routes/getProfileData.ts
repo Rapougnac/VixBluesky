@@ -1,15 +1,15 @@
 /** @jsx jsx */
-import { jsx } from "hono/jsx";
-import { Handler } from "hono";
-import { HTTPException } from "hono/http-exception";
-import { fetchProfile } from "../lib/fetchProfile";
+import { jsx } from 'hono/jsx';
+import { Handler } from 'hono';
+import { HTTPException } from 'hono/http-exception';
+import { fetchProfile } from '../lib/fetchProfile';
 
 export const getProfileData: Handler<
   Env,
-  "/profile/:user/json" | "/https://bsky.app/profile/:user/json"
+  '/profile/:user/json' | '/https://bsky.app/profile/:user/json'
 > = async (c) => {
   const { user } = c.req.param();
-  const agent = c.get("Agent");
+  const agent = c.get('Agent');
   try {
     var { data } = await fetchProfile(agent, { user });
   } catch (e) {

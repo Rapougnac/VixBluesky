@@ -1,10 +1,10 @@
-import { Handler } from "hono";
-import { HTTPException } from "hono/http-exception";
-import { fetchPost } from "../lib/fetchPostData";
-import { Post } from "../components/Post";
-import { parseEmbedImages } from "../lib/parseEmbedImages";
-import { checkType } from "../lib/utils";
-import { AppBskyFeedGetPosts } from "@atcute/client/lexicons";
+import { Handler } from 'hono';
+import { HTTPException } from 'hono/http-exception';
+import { fetchPost } from '../lib/fetchPostData';
+import { Post } from '../components/Post';
+import { parseEmbedImages } from '../lib/parseEmbedImages';
+import { checkType } from '../lib/utils';
+import { AppBskyFeedGetPosts } from '@atcute/client/lexicons';
 
 export interface VideoInfo {
   url: URL;
@@ -27,12 +27,12 @@ interface VideoEmbed {
 
 export const getPost: Handler<
   Env,
-  "/profile/:user/post/:post" | "/https://bsky.app/profile/:user/post/:post"
+  '/profile/:user/post/:post' | '/https://bsky.app/profile/:user/post/:post'
 > = async (c) => {
   const { user, post } = c.req.param();
-  const isDirect = c.req.query("direct");
+  const isDirect = c.req.query('direct');
 
-  const agent = c.get("Agent");
+  const agent = c.get('Agent');
   try {
     var { data } = await fetchPost(agent, { user, post });
   } catch (e) {
@@ -50,13 +50,13 @@ export const getPost: Handler<
   const embed = fetchedPost.embed as typeof fetchedPost.embed & { media: any };
 
   if (
-    checkType("app.bsky.embed.video", embed) ||
-    checkType("app.bsky.embed.video", embed?.media)
+    checkType('app.bsky.embed.video', embed) ||
+    checkType('app.bsky.embed.video', embed?.media)
   ) {
     const videoEmbed = (embed?.media ?? fetchedPost.embed) as VideoEmbed;
     videoMetaData = {
       url: new URL(
-        `https://bsky.social/xrpc/com.atproto.sync.getBlob?cid=${videoEmbed.cid}&did=${fetchedPost.author.did}`
+        `https://bsky.social/xrpc/com.atproto.sync.getBlob?cid=${videoEmbed.cid}&did=${fetchedPost.author.did}`,
       ),
       aspectRatio: videoEmbed.aspectRatio,
     };
@@ -71,7 +71,7 @@ export const getPost: Handler<
         videoMetadata={videoMetaData}
         apiUrl={c.env.VIXBLUESKY_API_URL}
         images={images}
-      />
+      />,
     );
   }
 

@@ -1,4 +1,4 @@
-import { html } from "hono/html";
+import { html } from 'hono/html';
 
 export interface LayoutProps {
   url: string;
@@ -7,11 +7,11 @@ export interface LayoutProps {
 
 export const Layout = ({ url, children }: LayoutProps) => {
   const removeLeadingSlash = url.substring(1);
-  const redirectUrl = removeLeadingSlash.startsWith("https://")
+  const redirectUrl = removeLeadingSlash.startsWith('https://')
     ? removeLeadingSlash
     : `https://bsky.app/${removeLeadingSlash}`;
   return html`
-    <!DOCTYPE html>
+    <!doctype html>
     <html>
       <head>
         <link rel="canonical" href="${url.substring(1)}" />

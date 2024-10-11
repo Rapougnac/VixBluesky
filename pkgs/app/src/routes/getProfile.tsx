@@ -1,14 +1,14 @@
-import { Handler } from "hono";
-import { HTTPException } from "hono/http-exception";
-import { fetchProfile } from "../lib/fetchProfile";
-import { Profile } from "../components/Profile";
+import { Handler } from 'hono';
+import { HTTPException } from 'hono/http-exception';
+import { fetchProfile } from '../lib/fetchProfile';
+import { Profile } from '../components/Profile';
 
 export const getProfile: Handler<
   Env,
-  "/profile/:user" | "/https://bsky.app/profile/:user"
+  '/profile/:user' | '/https://bsky.app/profile/:user'
 > = async (c) => {
   const { user } = c.req.param();
-  const agent = c.get("Agent");
+  const agent = c.get('Agent');
   try {
     var { data } = await fetchProfile(agent, { user });
   } catch (e) {
@@ -22,6 +22,6 @@ export const getProfile: Handler<
       profile={data}
       url={c.req.path}
       appDomain={c.env.VIXBLUESKY_APP_DOMAIN}
-    />
+    />,
   );
 };
